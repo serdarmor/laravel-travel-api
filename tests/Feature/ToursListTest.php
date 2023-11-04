@@ -45,7 +45,6 @@ class ToursListTest extends TestCase
     public function test_tours_list_returns_pagination():void
     {
 
-
         $travel = Travel::factory()->create();
         Tour::factory(16)->create(['travel_id' => $travel->id]);
 
@@ -54,5 +53,17 @@ class ToursListTest extends TestCase
         $response->assertStatus(200);
         $response->assertJsonCount(15,'data');
         $response->assertJsonPath('meta.last_page',2);
+    }
+
+
+    public function test_tour_list_returns_validation_errors(): void
+    {
+        $travel = Travel::factory()->create();
+
+        $response = $this->getJson('api/v1/travels/'.$travel->slug.'/tours?dateFrom=abcde');
+        $response->assertStatus(422);
+
+        $response = $this->getJson('api/v1/travels/'.$travel->slug.'/tours?priceFrom=abcde');
+        $response->assertStatus(422);
     }
 }
